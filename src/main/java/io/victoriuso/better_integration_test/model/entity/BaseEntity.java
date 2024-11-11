@@ -31,7 +31,6 @@ public class BaseEntity implements Serializable {
     protected Instant updatedAt;
 
     @CreatedBy
-    @Column(updatable = false)
     protected String createdBy;
 
     protected String updatedBy;

@@ -1,10 +1,12 @@
 package io.victoriuso.better_integration_test.controller;
 
 import io.victoriuso.better_integration_test.model.web.request.CreateUserRequest;
+import io.victoriuso.better_integration_test.model.web.request.LoginRequest;
 import io.victoriuso.better_integration_test.model.web.response.BaseResponse;
 import io.victoriuso.better_integration_test.model.web.response.CreateUserResponse;
 import io.victoriuso.better_integration_test.model.web.response.GetUserResponse;
 import io.victoriuso.better_integration_test.service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -19,7 +21,7 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping
-    public BaseResponse<CreateUserResponse> createUser(@RequestBody CreateUserRequest request) {
+    public BaseResponse<CreateUserResponse> createUser(@RequestBody @Valid CreateUserRequest request) {
         log.info("API create user is hit");
         this.userService.createNewUser(request);
         return BaseResponse.<CreateUserResponse>builder()
@@ -36,6 +38,20 @@ public class UserController {
             .code(String.valueOf(HttpStatus.OK.value()))
             .status(HttpStatus.OK.getReasonPhrase())
             .data(myUser)
+            .build();
+    }
+
+
+    @PostMapping(path = "/login")
+    public BaseResponse<GetUserResponse> doLogin(
+            @RequestBody @Valid LoginRequest loginRequest
+    ) {
+        log.info("API login request is hit");
+        final GetUserResponse user = this.userService.doLogin(loginRequest);
+        return BaseResponse.<GetUserResponse>builder()
+            .code(String.valueOf(HttpStatus.OK.value()))
+            .status(HttpStatus.OK.getReasonPhrase())
+            .data(user)
             .build();
     }
 }

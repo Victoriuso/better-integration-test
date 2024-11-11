@@ -6,13 +6,13 @@ import lombok.experimental.SuperBuilder;
 
 import java.time.Instant;
 
-@Entity(name = "my_user")
+@Entity(name = "users")
 @SuperBuilder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @Setter
 @Getter
-public class MyUser extends BaseEntity {
+public class User extends BaseEntity {
 
     private String userId;
 
