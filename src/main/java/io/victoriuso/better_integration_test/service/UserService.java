@@ -3,6 +3,7 @@ package io.victoriuso.better_integration_test.service;
 import io.victoriuso.better_integration_test.model.web.request.CreateUserRequest;
 import io.victoriuso.better_integration_test.model.web.request.LoginRequest;
 import io.victoriuso.better_integration_test.model.web.response.GetUserResponse;
+import io.victoriuso.better_integration_test.model.web.response.LoginResponse;
 
 public interface UserService
 {
@@ -10,5 +11,7 @@ public interface UserService
 
     GetUserResponse getUser(String id);
 
-    GetUserResponse doLogin(LoginRequest loginRequest);
+    LoginResponse doLogin(LoginRequest loginRequest);
+
+    Boolean doBanUser(String id);
 }

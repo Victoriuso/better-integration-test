@@ -5,6 +5,7 @@ import io.victoriuso.better_integration_test.model.web.request.LoginRequest;
 import io.victoriuso.better_integration_test.model.web.response.BaseResponse;
 import io.victoriuso.better_integration_test.model.web.response.CreateUserResponse;
 import io.victoriuso.better_integration_test.model.web.response.GetUserResponse;
+import io.victoriuso.better_integration_test.model.web.response.LoginResponse;
 import io.victoriuso.better_integration_test.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -43,15 +44,22 @@ public class UserController {
 
 
     @PostMapping(path = "/login")
-    public BaseResponse<GetUserResponse> doLogin(
+    public BaseResponse<LoginResponse> doLogin(
             @RequestBody @Valid LoginRequest loginRequest
     ) {
         log.info("API login request is hit");
-        final GetUserResponse user = this.userService.doLogin(loginRequest);
-        return BaseResponse.<GetUserResponse>builder()
+        final LoginResponse loginResponse = this.userService.doLogin(loginRequest);
+        return BaseResponse.<LoginResponse>builder()
             .code(String.valueOf(HttpStatus.OK.value()))
             .status(HttpStatus.OK.getReasonPhrase())
-            .data(user)
+            .data(loginResponse)
             .build();
+    }
+
+    @PatchMapping
+    public BaseResponse<Boolean> doBanUser() {
+        log.info("API ban user is hit");
+        return BaseResponse.<Boolean>builder()
+                .build();
     }
 }

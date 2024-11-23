@@ -4,8 +4,10 @@ import io.victoriuso.better_integration_test.model.entity.User;
 import io.victoriuso.better_integration_test.model.web.request.CreateUserRequest;
 import io.victoriuso.better_integration_test.model.web.request.LoginRequest;
 import io.victoriuso.better_integration_test.model.web.response.GetUserResponse;
+import io.victoriuso.better_integration_test.model.web.response.LoginResponse;
 import io.victoriuso.better_integration_test.repository.MyUserRepository;
 import io.victoriuso.better_integration_test.service.MessageQueueService;
+import io.victoriuso.better_integration_test.service.TokenHelperService;
 import io.victoriuso.better_integration_test.service.UserService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +22,7 @@ public class UserServiceImpl implements UserService {
 
     private final MyUserRepository myUserRepository;
     private final MessageQueueService messageQueueService;
+    private final TokenHelperService tokenHelperService;
 
     @Override
     public void createNewUser(CreateUserRequest createUserRequest) {
@@ -56,7 +59,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public GetUserResponse doLogin(LoginRequest loginRequest) {
+    public LoginResponse doLogin(LoginRequest loginRequest) {
         final User user = myUserRepository.findByUserId(loginRequest.getUsername()).orElse(null);
         if(user == null) {
             throw new EntityNotFoundException(loginRequest.getUsername());
@@ -71,11 +74,18 @@ public class UserServiceImpl implements UserService {
             throw new RuntimeException("User is already banned");
         }
 
-        return GetUserResponse.builder()
-            .email(user.getEmail())
-            .phoneNumber(user.getPhoneNumber())
-            .email(user.getEmail())
-            .fullName(user.getFullName())
-            .build();
+        final String token = tokenHelperService.generateToken(user);
+        return LoginResponse.builder()
+                .accessToken(token)
+                .build();
+    }
+
+    @Override
+    public Boolean doBanUser(String id) {
+        final User user = myUserRepository.findByUserId(id).orElse(null);
+        if(user == null) {
+            throw new EntityNotFoundException(id);
+        }
+        return true;
     }
 }
