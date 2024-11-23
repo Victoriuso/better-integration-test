@@ -39,8 +39,9 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
     - name: Setup JDK 17
-      uses: actions/setup-java@1
+      uses: actions/setup-java@v4
       with:
+        distribution: 'adopt'
         java-version: 17
     - name: Install dependencies
       run: mvn clean install -DskipTests=true -Dmaven.javadoc.skip=true -B -V

@@ -17,6 +17,6 @@ a better integration test with better seeding data.
 The User Service manages user-related operations such as registration, authentication, and profile management.
 
 #### Endpoints
-- `POST /api/users/register`: Register a new user.
-- `POST /api/users/login`: Authenticate a user.
-- `GET /api/users/{id}`: Retrieve user details by ID.
+- `POST /api/better-integration-test/user`: Register a new user.
+- `POST /api/better-integration-test/user/login`: Authenticate a user.
+- `GET /api/better-integration-test/user/{id}`: Retrieve user details by ID.
