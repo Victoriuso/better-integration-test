@@ -5,7 +5,7 @@ import io.victoriuso.better_integration_test.model.web.request.CreateUserRequest
 import io.victoriuso.better_integration_test.model.web.request.LoginRequest;
 import io.victoriuso.better_integration_test.model.web.response.GetUserResponse;
 import io.victoriuso.better_integration_test.model.web.response.LoginResponse;
-import io.victoriuso.better_integration_test.repository.MyUserRepository;
+import io.victoriuso.better_integration_test.repository.UserRepository;
 import io.victoriuso.better_integration_test.service.MessageQueueService;
 import io.victoriuso.better_integration_test.service.TokenHelperService;
 import io.victoriuso.better_integration_test.service.UserService;
@@ -15,12 +15,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
-    private final MyUserRepository myUserRepository;
+    private final UserRepository userRepository;
     private final MessageQueueService messageQueueService;
     private final TokenHelperService tokenHelperService;
 
@@ -35,12 +37,12 @@ public class UserServiceImpl implements UserService {
                 .phoneNumber(createUserRequest.getPhoneNumber())
                 .fullName(createUserRequest.getFullName())
                 .build();
-        myUserRepository.save(user);
+        userRepository.save(user);
     }
 
     @Override
     public GetUserResponse getUser(String id) {
-        final User user = myUserRepository.findById(id).orElse(null);
+        final User user = userRepository.findById(id).orElse(null);
         if(user == null) {
             throw new EntityNotFoundException(id);
         }
@@ -60,7 +62,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public LoginResponse doLogin(LoginRequest loginRequest) {
-        final User user = myUserRepository.findByUserId(loginRequest.getUsername()).orElse(null);
+        final User user = userRepository.findByUserId(loginRequest.getUsername()).orElse(null);
         if(user == null) {
             throw new EntityNotFoundException(loginRequest.getUsername());
         }
@@ -81,11 +83,19 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Boolean doBanUser(String id) {
-        final User user = myUserRepository.findByUserId(id).orElse(null);
+    public Boolean toggleBannedUser(String id, boolean isUserBanned) {
+        final User user = userRepository.findByUserId(id).orElse(null);
         if(user == null) {
             throw new EntityNotFoundException(id);
         }
+
+        if (user.getLastBanned() != null) {
+            return false;
+        }
+
+        final Instant lastBanned = isUserBanned ? Instant.now() : null;
+        user.setLastBanned(lastBanned);
+        userRepository.save(user);
         return true;
     }
 }

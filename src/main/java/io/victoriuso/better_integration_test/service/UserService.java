@@ -13,5 +13,5 @@ public interface UserService
 
     LoginResponse doLogin(LoginRequest loginRequest);
 
-    Boolean doBanUser(String id);
+    Boolean toggleBannedUser(String id, boolean isUserBanned);
 }

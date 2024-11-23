@@ -1,5 +1,6 @@
 package io.victoriuso.better_integration_test.controller;
 
+import io.victoriuso.better_integration_test.constant.ApiPathConstant;
 import io.victoriuso.better_integration_test.model.web.request.CreateUserRequest;
 import io.victoriuso.better_integration_test.model.web.request.LoginRequest;
 import io.victoriuso.better_integration_test.model.web.response.BaseResponse;
@@ -15,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
-@RequestMapping(path = "/api/better-integration-test/user")
+@RequestMapping(path = ApiPathConstant.USER_API)
 @RequiredArgsConstructor
 public class UserController {
 
@@ -56,10 +57,17 @@ public class UserController {
             .build();
     }
 
-    @PatchMapping
-    public BaseResponse<Boolean> doBanUser() {
+    @PatchMapping(path = "/{id}")
+    public BaseResponse<Boolean> toggleBannedUser(
+            @PathVariable String id,
+            @RequestParam String isBanned
+    ) {
         log.info("API ban user is hit");
+        final Boolean result = this.userService.toggleBannedUser(id, Boolean.parseBoolean(isBanned));
         return BaseResponse.<Boolean>builder()
+                .code(String.valueOf(HttpStatus.OK.value()))
+                .status(HttpStatus.OK.getReasonPhrase())
+                .data(result)
                 .build();
     }
 }
