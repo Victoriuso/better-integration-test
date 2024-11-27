@@ -1,0 +1,21 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPath": "/fraud-check",
+    "queryParameters": {
+      "email": {
+        "equalTo": "alice.smith@example.com"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "jsonBody": {
+      "email": "alice.smith@example.com",
+      "fraudDetected": false
+    },
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

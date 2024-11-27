@@ -6,9 +6,11 @@ import io.victoriuso.better_integration_test.model.web.request.LoginRequest;
 import io.victoriuso.better_integration_test.model.web.response.GetUserResponse;
 import io.victoriuso.better_integration_test.model.web.response.LoginResponse;
 import io.victoriuso.better_integration_test.repository.UserRepository;
+import io.victoriuso.better_integration_test.service.FraudCheckService;
 import io.victoriuso.better_integration_test.service.MessageQueueService;
 import io.victoriuso.better_integration_test.service.TokenHelperService;
 import io.victoriuso.better_integration_test.service.UserService;
+import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,9 +27,19 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final MessageQueueService messageQueueService;
     private final TokenHelperService tokenHelperService;
+    private final FraudCheckService fraudCheckService;
 
     @Override
     public void createNewUser(CreateUserRequest createUserRequest) {
+        final User existingUser = userRepository.findByUserId(createUserRequest.getUsername()).orElse(null);
+        if (existingUser != null) {
+            throw new EntityExistsException(existingUser.getUserId());
+        }
+
+        if(fraudCheckService.isEmailFraud(createUserRequest.getEmail())) {
+            throw new RuntimeException("Email fraud detected");
+        }
+
         final String password = new BCryptPasswordEncoder().encode(createUserRequest.getPassword());
         final User user = User
                 .builder()

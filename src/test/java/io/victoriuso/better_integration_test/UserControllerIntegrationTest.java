@@ -33,7 +33,8 @@ public class UserControllerIntegrationTest extends BaseIntegrationTestAbstract {
     }
 
     @AfterEach
-    void tearDown() {
+    public void tearDown() throws Exception {
+        super.tearDown();
         userRepository.deleteAll();
     }
 
