@@ -14,6 +14,8 @@ import org.springframework.stereotype.Service;
 import java.security.Key;
 import java.time.Instant;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 @Slf4j
@@ -29,8 +31,16 @@ public class TokenHelperServiceImpl implements TokenHelperService {
                 .expiration(new Date())
                 .issuedAt(new Date())
                 .expiration(expiration)
+                .claims(this.getClaims(user))
                 .signWith(this.getSecretKey());
         return jwtBuilder.compact();
+    }
+
+    private Map<String, String> getClaims(User user) {
+        final Map<String, String> claims = new HashMap<>();
+        claims.put("name", user.getFullName());
+        claims.put("email", user.getEmail());
+        return claims;
     }
 
     private Key getSecretKey() {

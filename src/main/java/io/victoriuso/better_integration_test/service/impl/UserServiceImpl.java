@@ -84,7 +84,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Boolean toggleBannedUser(String id, boolean isUserBanned) {
-        final User user = userRepository.findByUserId(id).orElse(null);
+        final User user = userRepository.findById(id).orElse(null);
         if(user == null) {
             throw new EntityNotFoundException(id);
         }
