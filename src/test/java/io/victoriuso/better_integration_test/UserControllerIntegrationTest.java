@@ -18,6 +18,8 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.RequestBuilder;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -45,8 +47,9 @@ public class UserControllerIntegrationTest extends BaseIntegrationTestAbstract {
     public void createUser_test_success() throws Exception {
         final String url = ApiPathConstant.USER_API;
         final String username = "alice_smith";
+        final String email = "alice.smith@example.com";
         final CreateUserRequest request = CreateUserRequest.builder()
-                .email("alice.smith@example.com")
+                .email(email)
                 .fullName("Alice Smith")
                 .phoneNumber("1987654321")
                 .password("password")
@@ -63,6 +66,10 @@ public class UserControllerIntegrationTest extends BaseIntegrationTestAbstract {
         //assert if the user is inserted
         final User user = userRepository.findByUserId(username).orElse(null);
         assertNotNull(user);
+
+        //assert API
+        verify(getRequestedFor(urlPathEqualTo("/fraud-check"))
+                .withQueryParam("email", equalTo(email)));
     }
 
     @Test
